@@ -12,6 +12,22 @@ const VoiceInput = () => {
   const [backendStatus, setBackendStatus] = useState<
     "unknown" | "online" | "offline"
   >("unknown");
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Get user ID from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          setUserId(userData._id);
+        } catch (err) {
+          console.error("Error parsing user data:", err);
+        }
+      }
+    }
+  }, []);
 
   // Check if backend is online
   useEffect(() => {
@@ -115,6 +131,11 @@ const VoiceInput = () => {
       return;
     }
 
+    if (!userId) {
+      toast.error("You must be logged in to create transactions");
+      return;
+    }
+
     setProcessing(true);
 
     try {
@@ -125,7 +146,7 @@ const VoiceInput = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: transcript }),
+        body: JSON.stringify({ text: transcript, userId }),
       });
 
       console.log("API response status:", response.status);
@@ -162,12 +183,23 @@ const VoiceInput = () => {
         </Alert>
       )}
 
+      {!userId && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Not Logged In</AlertTitle>
+          <AlertDescription>
+            You must be logged in to create transactions. Please log in first.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="space-y-4">
         <div className="flex flex-col space-y-2">
           <Button
             onClick={isListening ? stopListening : startListening}
             variant={isListening ? "destructive" : "default"}
             className="w-full"
+            disabled={!userId}
           >
             {isListening ? "Stop Recording" : "Start Recording"}
           </Button>
@@ -189,7 +221,8 @@ const VoiceInput = () => {
             !transcript ||
             processing ||
             isListening ||
-            backendStatus === "offline"
+            backendStatus === "offline" ||
+            !userId
           }
           className="w-full"
           variant="outline"
