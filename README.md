@@ -9,6 +9,13 @@ A simple finance application that allows users to add expenses and income using 
 - **Expense & Income Tracking**: Add both expenses and income to your financial records
 - **Simple UI**: Clean, modern interface built with Next.js and Tailwind CSS
 
+## Recent Updates
+
+- **Enhanced Voice Input Dialog**: A reusable dialog component that provides voice input functionality across different pages
+- **Context-Aware Voice Processing**: The system now recognizes the context (income/expense) and enhances voice commands accordingly
+- **Improved AI Integration**: Updated to use Gemini 1.5 Flash for better recognition and response times
+- **Consistent UI**: Standardized voice input interface across all transaction pages
+
 ## Tech Stack
 
 - **Frontend**: Next.js, React, Tailwind CSS, shadcn/ui
@@ -61,24 +68,45 @@ npm run server
 npm run dev
 ```
 
-3. (Optional) Run both frontend and backend concurrently
+3. Run both frontend and backend concurrently (recommended)
 
 ```
-npm run dev:full
+npm run dev:5001
 ```
 
 4. Open your browser and navigate to `http://localhost:3000`
 
 ## Usage
 
-1. Navigate to the Voice Transactions page
+### Voice Transactions
+
+You can add transactions using voice input from multiple pages:
+
+1. **Dashboard page**: Use the Voice Transaction button in the main dashboard
+2. **Income page**: Click the "Add via Speech" button
+3. **Expenses page**: Click the "Add via Speech" button
+
+### How to Use Voice Input
+
+1. Click the "Add via Speech" button on any transaction page
 2. Click "Start Recording" and speak about a financial transaction
-   - Example: "I spent $45 on groceries at Trader Joe's yesterday"
-   - Example: "Got paid $2000 as salary on Friday"
+   - For expenses: "I spent $45 on groceries at Trader Joe's yesterday"
+   - For income: "Got paid $2000 as salary on Friday"
 3. Click "Stop Recording" when finished
 4. Review the transcription
 5. Click "Create Transaction from Voice" to process
 6. The AI will extract transaction details and save it to the database
+
+## AI Processing Details
+
+The application uses Google's Gemini 1.5 Flash model to process voice commands. The system:
+
+1. Captures your voice input through your browser
+2. Sends the text to the Gemini AI
+3. Extracts key transaction details (amount, category, description, date, etc.)
+4. Creates a properly formatted transaction in the database
+
+If the AI service is temporarily unavailable, the system has a robust fallback mechanism that uses rule-based parsing to extract the basic transaction details.
 
 ## Notes for University Project
 
