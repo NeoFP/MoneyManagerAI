@@ -7,12 +7,12 @@ export async function GET(
   try {
     // In Next.js 15, we need to properly handle dynamic params
     const userId = context.params.userId;
-    console.log(`Fetching transactions for user ID: ${userId}`);
+    console.log(`Fetching budgets for user ID: ${userId}`);
 
     try {
       // Forward the request to our backend server
       const response = await fetch(
-        `http://localhost:5001/api/transactions/user/${userId}`,
+        `http://localhost:5001/api/budgets/user/${userId}`,
         {
           method: "GET",
           headers: {
@@ -39,7 +39,7 @@ export async function GET(
         }
 
         return NextResponse.json(
-          { error: errorData.error || "Failed to fetch user transactions" },
+          { error: errorData.error || "Failed to fetch user budgets" },
           { status: response.status }
         );
       }
@@ -56,7 +56,7 @@ export async function GET(
       }
 
       const data = JSON.parse(dataText);
-      console.log(`Received ${data.length} transactions for user ${userId}`);
+      console.log(`Received ${data.length} budgets for user ${userId}`);
 
       return NextResponse.json(data);
     } catch (fetchError: any) {

@@ -13,6 +13,7 @@ const voiceRoutes = require("./routes/voice");
 const authRoutes = require("./routes/auth");
 const debugRoutes = require("./routes/debug");
 const statusRoutes = require("./routes/status");
+const budgetRoutes = require("./routes/budgets");
 
 // Initialize express app
 const app = express();
@@ -71,6 +72,7 @@ app.use("/api/voice", voiceRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/debug", debugRoutes);
 app.use("/api/status", statusRoutes);
+app.use("/api/budgets", budgetRoutes);
 
 // Base route
 app.get("/", (req, res) => {
