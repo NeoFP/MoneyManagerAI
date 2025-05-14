@@ -171,58 +171,6 @@ export default function IncomePage() {
     };
   }, []);
 
-  const toggleListening = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
-    }
-  };
-
-  const startListening = () => {
-    setTranscript("");
-    setIsListening(true);
-
-    if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
-      const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.start();
-
-      recognition.onresult = (event: any) => {
-        const transcript = Array.from(event.results)
-          .map((result: any) => result[0])
-          .map((result: any) => result.transcript)
-          .join("");
-
-        setTranscript(transcript);
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-    } else {
-      toast({
-        title: "Speech Recognition Not Supported",
-        description: "Your browser doesn't support speech recognition.",
-        variant: "destructive",
-      });
-      setIsListening(false);
-    }
-  };
-
-  const stopListening = () => {
-    setIsListening(false);
-    if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
-      const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
-      recognition.stop();
-    }
-  };
-
   const parseIncomeFromSpeech = (text: string) => {
     // Simple parsing logic - can be enhanced with more sophisticated NLP
     const amountRegex = /\$?(\d+(\.\d{1,2})?)/;
@@ -462,17 +410,6 @@ export default function IncomePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            onClick={toggleListening}
-            variant={isListening ? "destructive" : "default"}
-          >
-            {isListening ? (
-              <MicOff className="mr-2 h-4 w-4" />
-            ) : (
-              <Mic className="mr-2 h-4 w-4" />
-            )}
-            {isListening ? "Stop Recording" : "Add via Speech"}
-          </Button>
           <VoiceTransactionDialog
             buttonText="Add via Speech"
             transactionType="income"
