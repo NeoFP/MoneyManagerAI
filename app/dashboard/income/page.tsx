@@ -37,6 +37,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import VoiceTransactionDialog from "@/app/components/VoiceTransactionDialog";
 
 type Income = {
   _id?: string;
@@ -472,21 +473,22 @@ export default function IncomePage() {
             )}
             {isListening ? "Stop Recording" : "Add via Speech"}
           </Button>
+          <VoiceTransactionDialog
+            buttonText="Add via Speech"
+            transactionType="income"
+            onTransactionCreated={() => fetchUserIncomes(userId!)}
+          />
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" /> Add Income
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>
-                  {editingIncome ? "Edit Income" : "Add New Income"}
-                </DialogTitle>
+                <DialogTitle>Add Income</DialogTitle>
                 <DialogDescription>
-                  {editingIncome
-                    ? "Edit the income details below."
-                    : "Fill in the details to add a new income entry."}
+                  Enter the details of your income.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
@@ -497,51 +499,29 @@ export default function IncomePage() {
                   <Input
                     id="amount"
                     type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    className="col-span-3"
-                    value={
-                      editingIncome ? editingIncome.amount : newIncome.amount
-                    }
+                    value={newIncome.amount}
                     onChange={(e) =>
-                      editingIncome
-                        ? setEditingIncome({
-                            ...editingIncome,
-                            amount: Number.parseFloat(e.target.value),
-                          })
-                        : setNewIncome({ ...newIncome, amount: e.target.value })
+                      setNewIncome({ ...newIncome, amount: e.target.value })
                     }
+                    className="col-span-3"
+                    placeholder="100.00"
+                    step="0.01"
+                    min="0"
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="source" className="text-right">
                     Source
                   </Label>
-                  <Select
-                    value={
-                      editingIncome ? editingIncome.source : newIncome.source
+                  <Input
+                    id="source"
+                    value={newIncome.source}
+                    onChange={(e) =>
+                      setNewIncome({ ...newIncome, source: e.target.value })
                     }
-                    onValueChange={(value) =>
-                      editingIncome
-                        ? setEditingIncome({
-                            ...editingIncome,
-                            source: value,
-                            category: value,
-                          })
-                        : setNewIncome({ ...newIncome, source: value })
-                    }
-                  >
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select a source" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sources.map((source) => (
-                        <SelectItem key={source} value={source}>
-                          {source}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    className="col-span-3"
+                    placeholder="Salary, Freelance, etc."
+                  />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="description" className="text-right">
@@ -549,24 +529,15 @@ export default function IncomePage() {
                   </Label>
                   <Input
                     id="description"
-                    placeholder="Description"
-                    className="col-span-3"
-                    value={
-                      editingIncome
-                        ? editingIncome.description
-                        : newIncome.description
-                    }
+                    value={newIncome.description}
                     onChange={(e) =>
-                      editingIncome
-                        ? setEditingIncome({
-                            ...editingIncome,
-                            description: e.target.value,
-                          })
-                        : setNewIncome({
-                            ...newIncome,
-                            description: e.target.value,
-                          })
+                      setNewIncome({
+                        ...newIncome,
+                        description: e.target.value,
+                      })
                     }
+                    className="col-span-3"
+                    placeholder="Monthly salary, Project payment, etc."
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -576,30 +547,17 @@ export default function IncomePage() {
                   <Input
                     id="date"
                     type="date"
-                    className="col-span-3"
-                    value={editingIncome ? editingIncome.date : newIncome.date}
+                    value={newIncome.date}
                     onChange={(e) =>
-                      editingIncome
-                        ? setEditingIncome({
-                            ...editingIncome,
-                            date: e.target.value,
-                          })
-                        : setNewIncome({ ...newIncome, date: e.target.value })
+                      setNewIncome({ ...newIncome, date: e.target.value })
                     }
+                    className="col-span-3"
                   />
                 </div>
               </div>
               <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={editingIncome ? handleEditIncome : handleAddIncome}
-                >
-                  {editingIncome ? "Save Changes" : "Add Income"}
+                <Button type="submit" onClick={handleAddIncome}>
+                  Add Income
                 </Button>
               </DialogFooter>
             </DialogContent>

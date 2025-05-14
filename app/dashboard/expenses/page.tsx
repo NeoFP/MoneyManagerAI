@@ -37,6 +37,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import VoiceTransactionDialog from "@/app/components/VoiceTransactionDialog";
 
 type Expense = {
   _id?: string;
@@ -474,17 +475,11 @@ export default function ExpensesPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            onClick={toggleListening}
-            variant={isListening ? "destructive" : "default"}
-          >
-            {isListening ? (
-              <MicOff className="mr-2 h-4 w-4" />
-            ) : (
-              <Mic className="mr-2 h-4 w-4" />
-            )}
-            {isListening ? "Stop Recording" : "Add via Speech"}
-          </Button>
+          <VoiceTransactionDialog
+            buttonText="Add via Speech"
+            transactionType="expense"
+            onTransactionCreated={() => fetchUserExpenses(userId!)}
+          />
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button>

@@ -145,28 +145,134 @@ exports.processVoiceText = async (req, res) => {
 
 // Helper function for fallback response
 const useFallbackResponse = async (text, userId, res) => {
-  // Create a simple transaction based on the text
+  const lowerText = text.toLowerCase();
+
+  // Check for expense-related keywords
+  const expenseKeywords = [
+    "spent",
+    "spend",
+    "spending",
+    "paid",
+    "pay",
+    "paying",
+    "payment",
+    "bought",
+    "buy",
+    "buying",
+    "purchase",
+    "purchased",
+    "cost",
+    "expense",
+    "bill",
+    "charged",
+  ];
+
+  // Check for income-related keywords
+  const incomeKeywords = [
+    "received",
+    "receive",
+    "receiving",
+    "earned",
+    "earn",
+    "earning",
+    "got paid",
+    "getting paid",
+    "get paid",
+    "income",
+    "salary",
+    "wage",
+    "wages",
+    "deposit",
+    "deposited",
+    "bonus",
+    "made",
+    "revenue",
+    "gain",
+    "profit",
+  ];
+
+  // Determine transaction type based on keywords
+  let isExpense = expenseKeywords.some((keyword) =>
+    lowerText.includes(keyword)
+  );
+  let isIncome = incomeKeywords.some((keyword) => lowerText.includes(keyword));
+
+  // If both or neither are detected, make a best guess based on context
+  let transactionType;
+  if (isExpense && !isIncome) {
+    transactionType = "expense";
+  } else if (isIncome && !isExpense) {
+    transactionType = "income";
+  } else {
+    // If ambiguous, look for additional context clues
+    transactionType =
+      lowerText.includes("salary") ||
+      lowerText.includes("paycheck") ||
+      lowerText.includes("received")
+        ? "income"
+        : "expense"; // Default to expense if still unclear
+  }
+
+  // Determine category based on keywords in text
+  let category = "Other";
+
+  if (
+    lowerText.includes("groceries") ||
+    lowerText.includes("food") ||
+    lowerText.includes("supermarket")
+  ) {
+    category = "Groceries";
+  } else if (
+    lowerText.includes("salary") ||
+    lowerText.includes("paycheck") ||
+    lowerText.includes("wage")
+  ) {
+    category = "Salary";
+  } else if (
+    lowerText.includes("transport") ||
+    lowerText.includes("uber") ||
+    lowerText.includes("taxi") ||
+    lowerText.includes("bus") ||
+    lowerText.includes("train")
+  ) {
+    category = "Transportation";
+  } else if (
+    lowerText.includes("rent") ||
+    lowerText.includes("housing") ||
+    lowerText.includes("mortgage")
+  ) {
+    category = "Housing";
+  } else if (
+    lowerText.includes("utilities") ||
+    lowerText.includes("electricity") ||
+    lowerText.includes("water") ||
+    lowerText.includes("gas") ||
+    lowerText.includes("internet")
+  ) {
+    category = "Utilities";
+  } else if (
+    lowerText.includes("entertainment") ||
+    lowerText.includes("movie") ||
+    lowerText.includes("restaurant") ||
+    lowerText.includes("dining")
+  ) {
+    category = "Entertainment";
+  } else if (
+    lowerText.includes("freelance") ||
+    lowerText.includes("contract work") ||
+    lowerText.includes("side job")
+  ) {
+    category = "Freelance";
+  }
+
+  // Extract amount using regex
+  const amount = parseFloat(text.match(/\$?(\d+(\.\d+)?)/)?.[1] || "0");
+
+  // Create the transaction object
   const mockTransaction = {
-    type:
-      text.toLowerCase().includes("spent") ||
-      text.toLowerCase().includes("spend") ||
-      text.toLowerCase().includes("spending") ||
-      text.toLowerCase().includes("paid") ||
-      text.toLowerCase().includes("pay") ||
-      text.toLowerCase().includes("bought") ||
-      text.toLowerCase().includes("buy")
-        ? "expense"
-        : "income",
-    amount: parseFloat(text.match(/\$?(\d+(\.\d+)?)/)?.[1] || "0"),
-    category: text.toLowerCase().includes("groceries")
-      ? "Groceries"
-      : text.toLowerCase().includes("salary")
-      ? "Salary"
-      : text.toLowerCase().includes("transport") ||
-        text.toLowerCase().includes("uber") ||
-        text.toLowerCase().includes("taxi")
-      ? "Transportation"
-      : "Other",
+    type: transactionType,
+    amount: amount,
+    category: category,
     description: text,
     date: new Date().toISOString().split("T")[0],
     userId: userId,
